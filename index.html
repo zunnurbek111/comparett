@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Comparator</title>
+    <title>Advanced Device Comparator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4759604567775048"
-     crossorigin="anonymous"></script>
-    <script async src="script.js"></script>
     <style>
         :root {
             --primary-color: #4a90e2;
             --primary-hover: #357abd;
+            --accent-color: #ff6b6b;
+            --accent-hover: #ff4757;
             --bg-dark: #1a1a1a;
             --bg-darker: #121212;
             --text-light: #ffffff;
@@ -23,6 +22,8 @@
             --highlight: #ffd700;
             --tab-active: #4a90e2;
             --tab-inactive: rgba(255, 255, 255, 0.1);
+            --chart-color-1: #4a90e2;
+            --chart-color-2: #ff6b6b;
         }
 
         :root[data-theme="light"] {
@@ -74,6 +75,11 @@
             align-items: center;
             gap: 20px;
         }
+        
+        .header-title i {
+            font-size: 1.8em;
+            color: var(--primary-color);
+        }
 
         h1 {
             font-size: 2em;
@@ -84,6 +90,7 @@
         .controls {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .category-tabs {
@@ -91,6 +98,7 @@
             display: flex;
             gap: 10px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         .category-tab {
@@ -126,6 +134,14 @@
             gap: 8px;
         }
 
+        .accent-btn {
+            background: var(--accent-color);
+        }
+
+        .accent-btn:hover {
+            background: var(--accent-hover);
+        }
+
         .btn:hover {
             background: var(--primary-hover);
             transform: translateY(-2px);
@@ -151,10 +167,45 @@
             transform: translateY(-5px);
         }
 
-        .item-container h2 {
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
+            background-color: rgba(74, 144, 226, 0.1);
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+        }
+
+        .item-container h2 {
             font-size: 1.2em;
             color: var(--text-light);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .item-container h2 i {
+            color: var(--primary-color);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.2em;
+        }
+
+        .action-btn:hover {
+            color: var(--primary-color);
         }
 
         .input-field {
@@ -214,6 +265,14 @@
         .spec-label {
             font-weight: 500;
             flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .spec-label i {
+            color: var(--primary-color);
+            font-size: 0.9em;
         }
 
         .spec-value {
@@ -224,6 +283,13 @@
         .better-spec {
             color: var(--highlight);
             font-weight: bold;
+        }
+
+        .comparison-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
         }
 
         @media (max-width: 768px) {
@@ -251,50 +317,114 @@
     <div class="container">
         <div class="header">
             <div class="header-title">
+                <i class="fas fa-exchange-alt"></i>
                 <h1 id="title">Сравнение устройств</h1>
             </div>
             <div class="controls">
-                <button id="lang-btn" class="btn" onclick="toggleLanguage()">RU</button>
+                <button id="lang-btn" class="btn" onclick="toggleLanguage()"><i class="fas fa-language"></i> RU</button>
                 <button id="theme-btn" class="btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
             </div>
             <div class="category-tabs">
-                <button id="phones-tab" class="category-tab active" onclick="switchCategory('phones')">Телефоны</button>
-                <button id="gpus-tab" class="category-tab" onclick="switchCategory('gpus')">Видеокарты</button>
-                <button id="cpus-tab" class="category-tab" onclick="switchCategory('cpus')">Процессоры</button>
+                <button id="phones-tab" class="category-tab active" onclick="switchCategory('phones')"><i class="fas fa-mobile-alt"></i> Телефоны</button>
+                <button id="laptops-tab" class="category-tab" onclick="switchCategory('laptops')"><i class="fas fa-laptop"></i> Ноутбуки</button>
+                <button id="tablets-tab" class="category-tab" onclick="switchCategory('tablets')"><i class="fas fa-tablet-alt"></i> Планшеты</button>
+                <button id="watches-tab" class="category-tab" onclick="switchCategory('watches')"><i class="fas fa-watch"></i> Смарт-часы</button>
+                <button id="gpus-tab" class="category-tab" onclick="switchCategory('gpus')"><i class="fas fa-microchip"></i> Видеокарты</button>
+                <button id="cpus-tab" class="category-tab" onclick="switchCategory('cpus')"><i class="fas fa-memory"></i> Процессоры</button>
             </div>
         </div>
+
         <div class="comparison">
             <div class="item-container">
-                <h2 id="item1-title">Устройство 1</h2>
-                <input type="text" class="input-field" oninput="handleInput(this, 'suggestions1')" placeholder="Выберите устройство">
+                <div class="item-header">
+                    <h2 id="item1-title"><i class="fas fa-mobile-alt"></i> Устройство 1</h2>
+                    <div class="item-actions">
+                        <button class="action-btn" onclick="addToFavorites('item1')" title="Add to favorites">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                </div>
+                <input type="text" class="input-field" id="input1" oninput="handleInput(this, 'suggestions1')" placeholder="Выберите устройство">
                 <div id="suggestions1" class="suggestions"></div>
                 <div id="specs1" class="specs"></div>
             </div>
             <div class="item-container">
-                <h2 id="item2-title">Устройство 2</h2>
-                <input type="text" class="input-field" oninput="handleInput(this, 'suggestions2')" placeholder="Выберите устройство">
+                <div class="item-header">
+                    <h2 id="item2-title"><i class="fas fa-mobile-alt"></i> Устройство 2</h2>
+                    <div class="item-actions">
+                        <button class="action-btn" onclick="addToFavorites('item2')" title="Add to favorites">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                </div>
+                <input type="text" class="input-field" id="input2" oninput="handleInput(this, 'suggestions2')" placeholder="Выберите устройство">
                 <div id="suggestions2" class="suggestions"></div>
                 <div id="specs2" class="specs"></div>
             </div>
+            <div id="device3" class="item-container" style="display: none;">
+                <div class="item-header">
+                    <h2 id="item3-title"><i class="fas fa-mobile-alt"></i> Устройство 3</h2>
+                    <div class="item-actions">
+                        <button class="action-btn" onclick="addToFavorites('item3')" title="Add to favorites">
+                            <i class="fas fa-star"></i>
+                        </button>
+                        <button class="action-btn" onclick="removeDevice('device3')" title="Remove device">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <input type="text" class="input-field" id="input3" oninput="handleInput(this, 'suggestions3')" placeholder="Выберите устройство">
+                <div id="suggestions3" class="suggestions"></div>
+                <div id="specs3" class="specs"></div>
+            </div>
+        </div>
+
+        <div class="comparison-actions">
+            <button id="add-device-btn" class="btn" onclick="addDevice()"><i class="fas fa-plus"></i> <span id="add-device-text">Добавить устройство</span></button>
+            <button id="clear-comparison-btn" class="btn accent-btn" onclick="clearComparison()"><i class="fas fa-trash"></i> <span id="clear-comparison-text">Очистить сравнение</span></button>
+        </div>
+        
+        <!-- Floating help button -->
+        <div class="info-btn" onclick="showHelp()">
+            <i class="fas fa-question"></i>
+        </div>
+        
+        <!-- Toast notification -->
+        <div id="toast" class="toast">
+            <i class="fas fa-info-circle"></i>
+            <span id="toast-message"></span>
         </div>
     </div>
 
     <script>
-        
+        // Translations
         const translations = {
             ru: {
                 title: 'Сравнение устройств',
                 phones: 'Телефоны',
+                laptops: 'Ноутбуки',
+                tablets: 'Планшеты',
+                watches: 'Смарт-часы',
                 gpus: 'Видеокарты',
                 cpus: 'Процессоры',
                 item1: 'Устройство 1',
                 item2: 'Устройство 2',
+                item3: 'Устройство 3',
+                add_device: 'Добавить устройство',
+                clear_comparison: 'Очистить сравнение',
                 placeholder: {
                     phones: 'Поиск телефона',
+                    laptops: 'Поиск ноутбука',
+                    tablets: 'Поиск планшета',
+                    watches: 'Поиск смарт-часов',
                     gpus: 'Поиск видеокарты',
                     cpus: 'Поиск процессора'
                 },
+                // Core device specs
                 screen: 'Экран',
+                resolution: 'Разрешение',
+                refresh_rate: 'Частота обновления',
+                display_type: 'Тип дисплея',
                 processor: 'Процессор',
                 ram: 'Оперативная память',
                 storage: 'Память',
@@ -303,17 +433,17 @@
                 year: 'Год выпуска',
                 charging: 'Зарядка',
                 price: 'Цена',
-                resolution: 'Разрешение',
-                refresh_rate: 'Частота обновления',
-                display_type: 'Тип дисплея',
+                // Phone specific
                 wireless_charging: 'Беспроводная зарядка',
                 ip_rating: 'Защита от воды',
                 os: 'Операционная система',
                 nfc: 'NFC',
                 build: 'Материалы корпуса',
+                // GPU specific
                 architecture: 'Архитектура',
                 process: 'Техпроцесс',
                 cuda_cores: 'CUDA ядра',
+                stream_processors: 'Потоковые процессоры',
                 boost_clock: 'Частота разгона',
                 memory: 'Память',
                 memory_speed: 'Частота памяти',
@@ -321,28 +451,49 @@
                 bandwidth: 'Пропускная способность',
                 ray_tracing: 'Трассировка лучей',
                 dlss: 'DLSS',
-                power: 'Энергопотребление',
-                stream_processors: 'Потоковые процессоры',
                 fsr: 'FSR',
+                power: 'Энергопотребление',
+                // CPU specific
                 cores: 'Ядра',
+                threads: 'Потоки',
                 base_clock: 'Базовая частота',
                 cache: 'Кэш',
                 integrated_graphics: 'Встроенная графика',
-                socket: 'Сокет'
+                socket: 'Сокет',
+                // Laptop specific
+                weight: 'Вес',
+                gpu: 'Видеокарта',
+                connectivity: 'Разъемы',
+                keyboard: 'Клавиатура',
+                touchpad: 'Тачпад',
+                cooling: 'Охлаждение'
             },
             en: {
                 title: 'Device Comparison',
                 phones: 'Phones',
+                laptops: 'Laptops',
+                tablets: 'Tablets',
+                watches: 'Smartwatches',
                 gpus: 'GPUs',
                 cpus: 'CPUs',
                 item1: 'Device 1',
                 item2: 'Device 2',
+                item3: 'Device 3',
+                add_device: 'Add device',
+                clear_comparison: 'Clear comparison',
                 placeholder: {
                     phones: 'Search phone',
+                    laptops: 'Search laptop',
+                    tablets: 'Search tablet',
+                    watches: 'Search smartwatch',
                     gpus: 'Search GPU',
                     cpus: 'Search CPU'
                 },
+                // Core device specs
                 screen: 'Screen',
+                resolution: 'Resolution',
+                refresh_rate: 'Refresh Rate',
+                display_type: 'Display Type',
                 processor: 'Processor',
                 ram: 'RAM',
                 storage: 'Storage',
@@ -351,17 +502,17 @@
                 year: 'Release Year',
                 charging: 'Charging',
                 price: 'Price',
-                resolution: 'Resolution',
-                refresh_rate: 'Refresh Rate',
-                display_type: 'Display Type',
+                // Phone specific
                 wireless_charging: 'Wireless Charging',
                 ip_rating: 'Water Resistance',
                 os: 'Operating System',
                 nfc: 'NFC',
                 build: 'Build Materials',
+                // GPU specific
                 architecture: 'Architecture',
                 process: 'Process Node',
                 cuda_cores: 'CUDA Cores',
+                stream_processors: 'Stream Processors',
                 boost_clock: 'Boost Clock',
                 memory: 'Memory',
                 memory_speed: 'Memory Speed',
@@ -369,44 +520,84 @@
                 bandwidth: 'Bandwidth',
                 ray_tracing: 'Ray Tracing',
                 dlss: 'DLSS',
-                power: 'Power Draw',
-                stream_processors: 'Stream Processors',
                 fsr: 'FSR',
+                power: 'Power Draw',
+                // CPU specific
                 cores: 'Cores',
+                threads: 'Threads',
                 base_clock: 'Base Clock',
                 cache: 'Cache',
                 integrated_graphics: 'Integrated Graphics',
-                socket: 'Socket'
+                socket: 'Socket',
+                // Laptop specific
+                weight: 'Weight',
+                gpu: 'Graphics Card',
+                connectivity: 'Ports',
+                keyboard: 'Keyboard',
+                touchpad: 'Touchpad',
+                cooling: 'Cooling'
             }
         };
 
+        // State
         let currentLang = 'ru';
         let currentCategory = 'phones';
-        let selectedItems = { item1: null, item2: null };
+        let selectedItems = { item1: null, item2: null, item3: null };
+        let deviceCount = 2;
+        let favorites = {};
 
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTheme();
+            updateTexts();
+            updatePlaceholders();
+            updateDeviceIcons();
+        });
+
+        // Language toggle
         function toggleLanguage() {
             currentLang = currentLang === 'ru' ? 'en' : 'ru';
             document.getElementById('lang-btn').textContent = currentLang.toUpperCase();
             updateTexts();
-            updateSpecsDisplay();
             updatePlaceholders();
+            updateSpecsDisplay();
         }
 
+        // Theme toggle
         function toggleTheme() {
             const theme = document.documentElement.getAttribute('data-theme');
             const newTheme = theme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
-            const icon = document.querySelector('#theme-btn i');
-            icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            updateTheme();
         }
 
+        function updateTheme() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const icon = document.querySelector('#theme-btn i');
+            icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        // Text updates
         function updateTexts() {
+            // Header
             document.getElementById('title').textContent = translations[currentLang].title;
+            
+            // Category tabs
             document.getElementById('phones-tab').textContent = translations[currentLang].phones;
+            document.getElementById('laptops-tab').textContent = translations[currentLang].laptops;
+            document.getElementById('tablets-tab').textContent = translations[currentLang].tablets;
+            document.getElementById('watches-tab').textContent = translations[currentLang].watches;
             document.getElementById('gpus-tab').textContent = translations[currentLang].gpus;
             document.getElementById('cpus-tab').textContent = translations[currentLang].cpus;
+            
+            // Device titles
             document.getElementById('item1-title').textContent = translations[currentLang].item1;
             document.getElementById('item2-title').textContent = translations[currentLang].item2;
+            document.getElementById('item3-title').textContent = translations[currentLang].item3;
+            
+            // Actions
+            document.getElementById('add-device-text').textContent = translations[currentLang].add_device;
+            document.getElementById('clear-comparison-text').textContent = translations[currentLang].clear_comparison;
         }
 
         function updatePlaceholders() {
@@ -416,6 +607,7 @@
             });
         }
 
+        // Category switching
         function switchCategory(category) {
             currentCategory = category;
             document.querySelectorAll('.category-tab').forEach(tab => {
@@ -423,8 +615,15 @@
             });
             document.getElementById(`${category}-tab`).classList.add('active');
 
-            // Reset all state
-            selectedItems = { item1: null, item2: null };
+            // Reset state for new category
+            selectedItems = { item1: null, item2: null, item3: null };
+            deviceCount = 2;
+            
+            // Hide third device if visible
+            const device3 = document.getElementById('device3');
+            if (device3) {
+                device3.style.display = 'none';
+            }
 
             // Clear input fields
             document.querySelectorAll('.input-field').forEach(input => {
@@ -442,10 +641,12 @@
             });
 
             updatePlaceholders();
+            updateDeviceIcons();
         }
 
+        // Input handling
         function handleInput(input, suggestionsId) {
-            const value = input.value.toLowerCase();
+            const value = input.value.toLowerCase().trim();
             const suggestions = document.getElementById(suggestionsId);
 
             if (value.length < 1) {
@@ -470,78 +671,275 @@
             suggestions.style.display = matches.length > 0 ? 'block' : 'none';
         }
 
+        // Get dataset based on category
         function getDataset() {
             switch(currentCategory) {
                 case 'phones': return phones;
+                case 'laptops': return laptops;
+                case 'tablets': return tablets;
+                case 'watches': return watches;
                 case 'gpus': return gpus;
                 case 'cpus': return cpus;
                 default: return phones;
             }
         }
 
+        // Select item from suggestions
         function selectItem(item, input, suggestionsId) {
             input.value = item.name;
             document.getElementById(suggestionsId).style.display = 'none';
 
-            const itemNumber = suggestionsId.includes('1') ? 'item1' : 'item2';
+            const itemNumber = suggestionsId.replace('suggestions', 'item');
             selectedItems[itemNumber] = item;
 
             updateSpecsDisplay();
         }
 
+        // Update specs display
         function updateSpecsDisplay() {
-            ['specs1', 'specs2'].forEach((specsId, index) => {
-                const itemKey = `item${index + 1}`;
+            const itemKeys = Object.keys(selectedItems).filter(key => selectedItems[key] !== null);
+            
+            itemKeys.forEach(itemKey => {
                 const item = selectedItems[itemKey];
-                const specsDiv = document.getElementById(specsId);
+                const specsDiv = document.getElementById(`specs${itemKey.replace('item', '')}`);
 
                 if (!item) {
                     specsDiv.innerHTML = '';
                     return;
                 }
 
-                const otherItem = selectedItems[index === 0 ? 'item2' : 'item1'];
-
                 specsDiv.innerHTML = Object.entries(item.specs)
                     .map(([key, value]) => {
                         let comparisonClass = '';
-                        if (otherItem) {
-                            const otherValue = otherItem.specs[key];
-                            const isBetter = compareSpecs(value, otherValue);
-                            if (isBetter === true) {
+                        
+                        // Compare with other selected items
+                        const otherItems = itemKeys.filter(k => k !== itemKey).map(k => selectedItems[k]);
+                        
+                        if (otherItems.length > 0) {
+                            const isBetter = compareWithOthers(key, value, otherItems);
+                            if (isBetter) {
                                 comparisonClass = 'better-spec';
                             }
                         }
+                        
+                        // Choose icon based on spec type
+                        let icon = getSpecIcon(key);
 
                         return `
                             <div class="spec-item">
-                                <span class="spec-label">${translations[currentLang][key] || key}</span>
+                                <span class="spec-label"><i class="${icon}"></i> ${translations[currentLang][key] || key}</span>
                                 <span class="spec-value ${comparisonClass}">${value}</span>
                             </div>
                         `;
                     }).join('');
             });
+            
+            // Update device icons based on category
+            updateDeviceIcons();
+        }
+        
+        // Get appropriate icon for spec
+        function getSpecIcon(key) {
+            const iconMap = {
+                screen: 'fas fa-tv',
+                resolution: 'fas fa-expand',
+                refresh_rate: 'fas fa-sync',
+                display_type: 'fas fa-desktop',
+                processor: 'fas fa-microchip',
+                ram: 'fas fa-memory',
+                storage: 'fas fa-hdd',
+                battery: 'fas fa-battery-full',
+                camera: 'fas fa-camera',
+                year: 'fas fa-calendar-alt',
+                charging: 'fas fa-bolt',
+                price: 'fas fa-tag',
+                wireless_charging: 'fas fa-wifi',
+                ip_rating: 'fas fa-tint',
+                os: 'fas fa-cog',
+                nfc: 'fas fa-wifi',
+                build: 'fas fa-layer-group',
+                architecture: 'fas fa-microchip',
+                process: 'fas fa-border-none',
+                cuda_cores: 'fas fa-cubes',
+                stream_processors: 'fas fa-stream',
+                boost_clock: 'fas fa-tachometer-alt',
+                memory: 'fas fa-memory',
+                memory_speed: 'fas fa-tachometer-alt',
+                memory_bus: 'fas fa-exchange-alt',
+                bandwidth: 'fas fa-network-wired',
+                ray_tracing: 'fas fa-lightbulb',
+                dlss: 'fas fa-magic',
+                fsr: 'fas fa-magic',
+                power: 'fas fa-plug',
+                cores: 'fas fa-dice-d6',
+                threads: 'fas fa-sitemap',
+                base_clock: 'fas fa-clock',
+                cache: 'fas fa-database',
+                integrated_graphics: 'fas fa-images',
+                socket: 'fas fa-plug',
+                weight: 'fas fa-weight',
+                gpu: 'fas fa-gamepad',
+                connectivity: 'fas fa-usb',
+                keyboard: 'fas fa-keyboard',
+                touchpad: 'fas fa-hand-pointer',
+                cooling: 'fas fa-wind',
+                pencil_support: 'fas fa-pen',
+                keyboard_support: 'fas fa-keyboard',
+                heart_rate: 'fas fa-heartbeat',
+                gps: 'fas fa-map-marker-alt',
+                water_resistance: 'fas fa-water',
+                battery_life: 'fas fa-clock'
+            };
+            
+            return iconMap[key] || 'fas fa-info-circle';
+        }
+        
+        // Update device icons based on category
+        function updateDeviceIcons() {
+            let icon;
+            switch(currentCategory) {
+                case 'phones': icon = 'fas fa-mobile-alt'; break;
+                case 'laptops': icon = 'fas fa-laptop'; break;
+                case 'tablets': icon = 'fas fa-tablet-alt'; break;
+                case 'watches': icon = 'fas fa-watch'; break;
+                case 'gpus': icon = 'fas fa-microchip'; break;
+                case 'cpus': icon = 'fas fa-memory'; break;
+                default: icon = 'fas fa-mobile-alt';
+            }
+            
+            // Update icons in device headers
+            document.querySelectorAll('.item-container h2 i').forEach(el => {
+                el.className = icon;
+            });
         }
 
-        function compareSpecs(spec1, spec2) {
-            if (!spec1 || !spec2) return null;
+        // Compare a spec with other items
+        function compareWithOthers(key, value, otherItems) {
+            // Skip comparison for certain specs
+            const noCompareSpecs = ['os', 'build', 'architecture', 'process', 'integrated_graphics', 'socket'];
+            if (noCompareSpecs.includes(key)) return false;
+            
+            // For boolean values like "Yes" vs "No"
+            if (value === "Yes" && otherItems.some(item => item.specs[key] === "No")) return true;
+            if (value === "No" && otherItems.every(item => item.specs[key] === "No")) return false;
+            
+            // Extract numeric values if possible
+            const num = extractNumber(value);
+            if (num === null) return false;
+            
+            // Determine if higher is better
+            const higherIsBetter = isHigherBetter(key);
+            
+            // Compare with other items
+            for (const otherItem of otherItems) {
+                const otherValue = otherItem.specs[key];
+                if (!otherValue) continue;
+                
+                const otherNum = extractNumber(otherValue);
+                if (otherNum === null) continue;
+                
+                if (higherIsBetter && num <= otherNum) return false;
+                if (!higherIsBetter && num >= otherNum) return false;
+            }
+            
+            return true;
+        }
 
-            const num1 = parseFloat(spec1.match(/\d+\.?\d*/));
-            const num2 = parseFloat(spec2.match(/\d+\.?\d*/));
-
-            if (!isNaN(num1) && !isNaN(num2)) {
-                return num1 > num2;
+        // Extract number from string
+        function extractNumber(str) {
+            if (typeof str !== 'string') return null;
+            
+            const match = str.match(/(\d+\.?\d*)/);
+            if (match) {
+                return parseFloat(match[0]);
             }
             return null;
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('#theme-btn i').className = 'fas fa-moon';
-            updatePlaceholders();
-            updateTexts();
-        });
+        // Determine if higher value is better for a spec
+        function isHigherBetter(key) {
+            const lowerIsBetter = [
+                'weight', 'price', 'process', 'power'
+            ];
+            
+            return !lowerIsBetter.includes(key);
+        }
 
+        // Add another device for comparison
+        function addDevice() {
+            if (deviceCount >= 3) return;
+            
+            const device3 = document.getElementById('device3');
+            device3.style.display = 'block';
+            deviceCount = 3;
+        }
+
+        // Remove device from comparison
+        function removeDevice(deviceId) {
+            const device = document.getElementById(deviceId);
+            device.style.display = 'none';
+            
+            const itemNumber = deviceId.replace('device', 'item');
+            selectedItems[itemNumber] = null;
+            
+            deviceCount--;
+            
+            updateSpecsDisplay();
+        }
+
+        // Clear comparison
+        function clearComparison() {
+            selectedItems = { item1: null, item2: null, item3: null };
+            deviceCount = 2;
+            
+            // Clear input fields
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.value = '';
+            });
+            
+            // Clear specs displays
+            document.querySelectorAll('.specs').forEach(specs => {
+                specs.innerHTML = '';
+            });
+            
+            // Hide third device if visible
+            const device3 = document.getElementById('device3');
+            if (device3) {
+                device3.style.display = 'none';
+            }
+        }
+
+        // Add to favorites (placeholder function)
+        function addToFavorites(itemKey) {
+            const item = selectedItems[itemKey];
+            if (!item) return;
+            
+            showToast(`Устройство "${item.name}" добавлено в избранное`);
+        }
+        
+        // Show help modal
+        function showHelp() {
+            let message = currentLang === 'ru' ? 
+                'Выберите категорию устройств и введите название устройства для сравнения. Зеленым выделены лучшие характеристики.' : 
+                'Select a device category and enter device name to compare. Better specifications are highlighted in green.';
+                
+            showToast(message);
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Device databases
         const phones = [
             {
                 name: 'Motorola Moto G Power (2024)',
@@ -632,271 +1030,73 @@
                 }
             },
             {
-                "name": "iPhone 16 Pro Max",
-                "specs": {
-                    "screen": "6.9\"",
-                    "resolution": "3000 x 1400",
-                    "refresh_rate": "120 Hz",
-                    "display_type": "OLED ProMotion",
-                    "processor": "A18 Pro",
-                    "ram": "8GB LPDDR5",
-                    "storage": "256GB/512GB/1TB",
-                    "battery": "4800 mAh",
-                    "camera": "48MP + 48MP + 12MP",
-                    "year": "2024",
-                    "charging": "25W",
-                    "wireless_charging": "15W MagSafe",
-                    "ip_rating": "IP68",
-                    "os": "iOS 18",
-                    "price": "$1299",
-                    "nfc": "Yes",
-                    "build": "Titanium frame, Ceramic Shield"
+                name: "iPhone 16 Pro Max",
+                specs: {
+                    screen: '6.9"',
+                    resolution: "3000 x 1400",
+                    refresh_rate: "120 Hz",
+                    display_type: "OLED ProMotion",
+                    processor: "A18 Pro",
+                    ram: "8GB LPDDR5",
+                    storage: "256GB/512GB/1TB",
+                    battery: "4800 mAh",
+                    camera: "48MP + 48MP + 12MP",
+                    year: "2024",
+                    charging: "25W",
+                    wireless_charging: "15W MagSafe",
+                    ip_rating: "IP68",
+                    os: "iOS 18",
+                    price: "$1299",
+                    nfc: "Yes",
+                    build: "Titanium frame, Ceramic Shield"
                 }
             },
             {
-                "name": "iPhone 15 Pro Max",
-                "specs": {
-                    "screen": "6.7\"",
-                    "resolution": "2796 x 1290",
-                    "refresh_rate": "120Hz",
-                    "display_type": "OLED ProMotion",
-                    "processor": "A17 Pro",
-                    "ram": "8GB",
-                    "storage": "256GB/512GB/1TB",
-                    "battery": "4422 mAh",
-                    "camera": "48MP + 12MP + 12MP",
-                    "year": "2023",
-                    "charging": "20W",
-                    "wireless_charging": "15W MagSafe",
-                    "ip_rating": "IP68",
-                    "os": "iOS 17",
-                    "price": "$1199",
-                    "nfc": "Yes",
-                    "build": "Titanium frame, Ceramic Shield"
+                name: "iPhone 15 Pro Max",
+                specs: {
+                    screen: '6.7"',
+                    resolution: "2796 x 1290",
+                    refresh_rate: "120Hz",
+                    display_type: "OLED ProMotion",
+                    processor: "A17 Pro",
+                    ram: "8GB",
+                    storage: "256GB/512GB/1TB",
+                    battery: "4422 mAh",
+                    camera: "48MP + 12MP + 12MP",
+                    year: "2023",
+                    charging: "20W",
+                    wireless_charging: "15W MagSafe",
+                    ip_rating: "IP68",
+                    os: "iOS 17",
+                    price: "$1199",
+                    nfc: "Yes",
+                    build: "Titanium frame, Ceramic Shield"
                 }
             },
             {
-                "name": "iPhone 15 Pro",
-                "specs": {
-                    "screen": "6.1\"",
-                    "resolution": "2556 x 1179",
-                    "refresh_rate": "120Hz",
-                    "display_type": "OLED ProMotion",
-                    "processor": "A17 Pro",
-                    "ram": "8GB",
-                    "storage": "128GB/256GB/512GB/1TB",
-                    "battery": "3274 mAh",
-                    "camera": "48MP + 12MP + 12MP",
-                    "year": "2023",
-                    "charging": "20W",
-                    "wireless_charging": "15W MagSafe",
-                    "ip_rating": "IP68",
-                    "os": "iOS 17",
-                    "price": "$999",
-                    "nfc": "Yes",
-                    "build": "Titanium frame, Ceramic Shield"
+                name: "Samsung Galaxy S24 Ultra",
+                specs: {
+                    screen: '6.8"',
+                    resolution: "3088 x 1440",
+                    refresh_rate: "120Hz",
+                    display_type: "Dynamic AMOLED 2X",
+                    processor: "Snapdragon 8 Gen 3",
+                    ram: "12GB",
+                    storage: "256GB/512GB/1TB",
+                    battery: "5000 mAh",
+                    camera: "200MP + 12MP + 50MP + 10MP",
+                    year: "2024",
+                    charging: "45W",
+                    wireless_charging: "15W",
+                    ip_rating: "IP68",
+                    os: "Android 14",
+                    price: "$1299",
+                    nfc: "Yes",
+                    build: "Titanium frame, Gorilla Glass Victus 3"
                 }
             },
             {
-                "name": "iPhone 14 Pro Max",
-                "specs": {
-                    "screen": "6.7\"",
-                    "resolution": "2796 x 1290",
-                    "refresh_rate": "120Hz",
-                    "display_type": "OLED ProMotion",
-                    "processor": "A16 Bionic",
-                    "ram": "6GB",
-                    "storage": "128GB/256GB/512GB/1TB",
-                    "battery": "4323 mAh",
-                    "camera": "48MP + 12MP + 12MP",
-                    "year": "2022",
-                    "charging": "20W",
-                    "wireless_charging": "15W MagSafe",
-                    "ip_rating": "IP68",
-                    "os": "iOS 16",
-                    "price": "$1099",
-                    "nfc": "Yes",
-                    "build": "Stainless Steel frame, Ceramic Shield"
-                }
-            },
-            {
-                "name": "iPhone 13 Pro Max",
-                "specs": {
-                    "screen": "6.7\"",
-                    "resolution": "2778 x 1284",
-                    "refresh_rate": "120Hz",
-                    "display_type": "OLED ProMotion",
-                    "processor": "A15 Bionic",
-                    "ram": "6GB",
-                    "storage": "128GB/256GB/512GB/1TB",
-                    "battery": "4352 mAh",
-                    "camera": "12MP + 12MP + 12MP",
-                    "year": "2021",
-                    "charging": "20W",
-                    "wireless_charging": "15W MagSafe",
-                    "ip_rating": "IP68",
-                    "os": "iOS 15",
-                    "price": "$1099",
-                    "nfc": "Yes",
-                    "build": "Stainless Steel frame, Ceramic Shield"
-                }
-            },
-            {
-                "name": "iPhone 12 Pro Max",
-                "specs": {
-                    "screen": "6.7\"",
-                    "resolution": "2778 x 1284",
-                    "refresh_rate": "60Hz",
-                    "display_type": "OLED",
-                    "processor": "A14 Bionic",
-                    "ram": "6GB",
-                    "storage": "128GB/256GB/512GB",
-                    "battery": "3687 mAh",
-                    "camera": "12MP + 12MP + 12MP",
-                    "year": "2020",
-                    "charging": "20W",
-                    "wireless_charging": "15W MagSafe",
-                    "ip_rating": "IP68",
-                    "os": "iOS 14",
-                    "price": "$1099",
-                    "nfc": "Yes",
-                    "build": "Stainless Steel frame, Ceramic Shield"
-                }
-            },
-            {
-                "name": "iPhone 11 Pro Max",
-                "specs": {
-                    "screen": "6.5\"",
-                    "resolution": "2688 x 1242",
-                    "refresh_rate": "60Hz",
-                    "display_type": "OLED",
-                    "processor": "A13 Bionic",
-                    "ram": "4GB",
-                    "storage": "64GB/256GB/512GB",
-                    "battery": "3969 mAh",
-                    "camera": "12MP + 12MP + 12MP",
-                    "year": "2019",
-                    "charging": "18W",
-                    "wireless_charging": "7.5W",
-                    "ip_rating": "IP68",
-                    "os": "iOS 13",
-                    "price": "$1099",
-                    "nfc": "Yes",
-                    "build": "Stainless Steel frame, Glass"
-                }
-            },
-            {
-                "name": "Samsung Galaxy S24 Ultra",
-                "specs": {
-                    "screen": "6.8\"",
-                    "resolution": "3088 x 1440",
-                    "refresh_rate": "120Hz",
-                    "display_type": "Dynamic AMOLED 2X",
-                    "processor": "Snapdragon 8 Gen 3",
-                    "ram": "12GB",
-                    "storage": "256GB/512GB/1TB",
-                    "battery": "5000 mAh",
-                    "camera": "200MP + 12MP + 50MP + 10MP",
-                    "year": "2024",
-                    "charging": "45W",
-                    "wireless_charging": "15W",
-                    "ip_rating": "IP68",
-                    "os": "Android 14",
-                    "price": "$1299",
-                    "nfc": "Yes",
-                    "build": "Titanium frame, Gorilla Glass Victus 3"
-                }
-            },
-            {
-                "name": "Samsung Galaxy S23 Ultra",
-                "specs": {
-                    "screen": "6.8\"",
-                    "resolution": "3088 x 1440",
-                    "refresh_rate": "120Hz",
-                    "display_type": "Dynamic AMOLED 2X",
-                    "processor": "Snapdragon 8 Gen 2",
-                    "ram": "8GB/12GB",
-                    "storage": "256GB/512GB/1TB",
-                    "battery": "5000 mAh",
-                    "camera": "200MP + 12MP + 10MP + 10MP",
-                    "year": "2023",
-                    "charging": "45W",
-                    "wireless_charging": "15W",
-                    "ip_rating": "IP68",
-                    "os": "Android 13",
-                    "price": "$1199",
-                    "nfc": "Yes",
-                    "build": "Aluminum frame, Gorilla Glass Victus 2"
-                }
-            },
-            {
-                "name": "Samsung Galaxy S22 Ultra",
-                "specs": {
-                    "screen": "6.8\"",
-                    "resolution": "3088 x 1440",
-                    "refresh_rate": "120Hz",
-                    "display_type": "Dynamic AMOLED 2X",
-                    "processor": "Snapdragon 8 Gen 1",
-                    "ram": "8GB/12GB",
-                    "storage": "128GB/256GB/512GB/1TB",
-                    "battery": "5000 mAh",
-                    "camera": "108MP + 12MP + 10MP + 10MP",
-                    "year": "2022",
-                    "charging": "45W",
-                    "wireless_charging": "15W",
-                    "ip_rating": "IP68",
-                    "os": "Android 12",
-                    "price": "$1199",
-                    "nfc": "Yes",
-                    "build": "Aluminum frame, Gorilla Glass Victus+"
-                }
-            },
-            {
-                "name": "Samsung Galaxy S21 Ultra",
-                "specs": {
-                    "screen": "6.8\"",
-                    "resolution": "3200 x 1440",
-                    "refresh_rate": "120Hz",
-                    "display_type": "Dynamic AMOLED 2X",
-                    "processor": "Exynos 2100/Snapdragon 888",
-                    "ram": "12GB/16GB",
-                    "storage": "128GB/256GB/512GB",
-                    "battery": "5000 mAh",
-                    "camera": "108MP + 12MP + 10MP + 10MP",
-                    "year": "201",
-                    "charging": "25W",
-                    "wireless_charging": "15W",
-                    "ip_rating": "IP68",
-                    "os": "Android 11",
-                    "price": "$1199",
-                                        "nfc": "Yes",
-                    "build": "Aluminum frame, Gorilla Glass Victus"
-                }
-            },
-            {
-                "name": "Samsung Galaxy S20 Ultra",
-                "specs": {
-                    "screen": "6.9\"",
-                    "resolution": "3200 x 1440",
-                    "refresh_rate": "120Hz",
-                    "display_type": "Dynamic AMOLED 2X",
-                    "processor": "Exynos 990/Snapdragon 865",
-                    "ram": "12GB/16GB",
-                    "storage": "128GB/256GB/512GB",
-                    "battery": "5000 mAh",
-                    "camera": "108MP + 48MP + 12MP + ToF",
-                    "year": "2020",
-                    "charging": "45W",
-                    "wireless_charging": "15W",
-                    "ip_rating": "IP68",
-                    "os": "Android 10",
-                    "price": "$1399",
-                    "nfc": "Yes",
-                    "build": "Aluminum frame, Gorilla Glass 6"
-                }
-            },
-            {
-                name: 'Xiaomi 14 Ultra',
+                name: "Xiaomi 14 Ultra",
                 specs: {
                     screen: '6.73"',
                     resolution: '3200 x 1440',
@@ -915,296 +1115,6 @@
                     price: '$1199',
                     nfc: 'Yes',
                     build: 'Titanium frame, Ceramic back'
-                }
-            },
-            {
-                name: 'Xiaomi 13T Pro',
-                specs: {
-                    screen: '6.67"',
-                    resolution: '2712 x 1220',
-                    refresh_rate: '144 Hz',
-                    display_type: 'AMOLED',
-                    processor: 'Dimensity 9200+',
-                    ram: '12GB/16GB',
-                    storage: '256GB/512GB/1TB',
-                    battery: '5000 mAh',
-                    camera: '50MP + 50MP + 12MP',
-                    year: '2023',
-                    charging: '120W',
-                    wireless_charging: 'No',
-                    ip_rating: 'IP68',
-                    os: 'MIUI 14',
-                    price: '$799',
-                    nfc: 'Yes',
-                    build: 'Glass front and back, aluminum frame'
-                }
-            },
-            {
-                name: 'POCO X6 Pro',
-                specs: {
-                    screen: '6.67"',
-                    resolution: '2712 x 1220',
-                    refresh_rate: '120 Hz',
-                    display_type: 'AMOLED',
-                    processor: 'Dimensity 8300-Ultra',
-                    ram: '8GB/12GB LPDDR5X',
-                    storage: '256GB/512GB',
-                    battery: '5000 mAh',
-                    camera: '64MP + 8MP + 2MP',
-                    year: '2024',
-                    charging: '67W',
-                    wireless_charging: 'No',
-                    ip_rating: 'IP54',
-                    os: 'HyperOS',
-                    price: '$349',
-                    nfc: 'Yes',
-                    build: 'Glass front, Glass back, Plastic frame'
-                }
-            },
-            {
-                name: 'POCO F5',
-                specs: {
-                    screen: '6.67"',
-                    resolution: '2400 x 1080',
-                    refresh_rate: '120 Hz',
-                    display_type: 'AMOLED',
-                    processor: 'Snapdragon 7+ Gen 2',
-                    ram: '8GB/12GB',
-                    storage: '256GB',
-                    battery: '5000 mAh',
-                    camera: '64MP + 8MP + 2MP',
-                    year: '2023',
-                    charging: '67W',
-                    wireless_charging: 'No',
-                    ip_rating: 'IP53',
-                    os: 'MIUI 14',
-                    price: '$329',
-                    nfc: 'Yes',
-                    build: 'Glass front, Plastic frame'
-                }
-            },
-            {
-                name: 'ASUS ROG Phone 8 Pro',
-                specs: {
-                    screen: '6.78"',
-                    resolution: '2448 x 1080',
-                    refresh_rate: '165 Hz',
-                    display_type: 'AMOLED',
-                    processor: 'Snapdragon 8 Gen 3',
-                    ram: '16GB/24GB LPDDR5X',
-                    storage: '512GB/1TB',
-                    battery: '5500 mAh',
-                    camera: '50MP + 13MP + 32MP',
-                    year: '2024',
-                    charging: '65W',
-                    wireless_charging: '15W',
-                    ip_rating: 'IP68',
-                    os: 'Android 14',
-                    price: '$1199',
-                    nfc: 'Yes',
-                    build: 'Gorilla Glass Victus 2, Aluminum frame'
-                }
-            },
-            {
-                name: 'ASUS Zenfone 10',
-                specs: {
-                    screen: '5.9"',
-                    resolution: '2400 x 1080',
-                    refresh_rate: '144 Hz',
-                    display_type: 'AMOLED',
-                    processor: 'Snapdragon 8 Gen 2',
-                    ram: '8GB/16GB',
-                    storage: '128GB/256GB/512GB',
-                    battery: '4300 mAh',
-                    camera: '50MP + 13MP',
-                    year: '2023',
-                    charging: '30W',
-                    wireless_charging: '15W',
-                    ip_rating: 'IP68',
-                    os: 'Android 13',
-                    price: '$699',
-                    nfc: 'Yes',
-                    build: 'Gorilla Glass Victus, Aluminum frame'
-                }
-            },
-            {
-                name: 'Intel Core i9-14900KS',
-                specs: {
-                    architecture: 'Raptor Lake Refresh',
-                    process: '10nm Intel 7',
-                    cores: '24 (8P + 16E)',
-                    threads: '32',
-                    base_clock: '3.2 GHz',
-                    boost_clock: '6.2 GHz',
-                    cache: '36MB L3 + 32MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'Intel UHD 770',
-                    power: '150W/253W',
-                    socket: 'LGA 1700',
-                    price: '$699',
-                    year: '2024'
-                }
-            },
-            {
-                name: 'Intel Core i7-14700KF',
-                specs: {
-                    architecture: 'Raptor Lake Refresh',
-                    process: '10nm Intel 7',
-                    cores: '20 (8P + 12E)',
-                    threads: '28',
-                    base_clock: '3.4 GHz',
-                    boost_clock: '5.6 GHz',
-                    cache: '33MB L3 + 28MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'No',
-                    power: '125W/253W',
-                    socket: 'LGA 1700',
-                    price: '$409',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'Intel Core i5-14600K',
-                specs: {
-                    architecture: 'Raptor Lake Refresh',
-                    process: '10nm Intel 7',
-                    cores: '14 (6P + 8E)',
-                    threads: '20',
-                    base_clock: '3.5 GHz',
-                    boost_clock: '5.3 GHz',
-                    cache: '24MB L3 + 20MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'Intel UHD 770',
-                    power: '125W/181W',
-                    socket: 'LGA 1700',
-                    price: '$319',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'AMD Ryzen 9 7950X3D',
-                specs: {
-                    architecture: 'Zen 4 + 3D V-Cache',
-                    process: '5nm',
-                    cores: '16',
-                    threads: '32',
-                    base_clock: '4.2 GHz',
-                    boost_clock: '5.7 GHz',
-                    cache: '128MB L3 + 16MB L2',
-                    memory: 'DDR5',
-                    integrated_graphics: 'AMD RDNA 2',
-                    power: '120W',
-                    socket: 'AM5',
-                    price: '$699',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'AMD Ryzen 7 7800X3D',
-                specs: {
-                    architecture: 'Zen 4 + 3D V-Cache',
-                    process: '5nm',
-                    cores: '8',
-                    threads: '16',
-                    base_clock: '4.2 GHz',
-                    boost_clock: '5.0 GHz',
-                    cache: '96MB L3 + 8MB L2',
-                    memory: 'DDR5',
-                    integrated_graphics: 'AMD RDNA 2',
-                    power: '120W',
-                    socket: 'AM5',
-                    price: '$449',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'AMD Ryzen 5 7600',
-                specs: {
-                    architecture: 'Zen 4',
-                    process: '5nm',
-                    cores: '6',
-                    threads: '12',
-                    base_clock: '3.8 GHz',
-                    boost_clock: '5.1 GHz',
-                    cache: '32MB L3 + 6MB L2',
-                    memory: 'DDR5',
-                    integrated_graphics: 'AMD RDNA 2',
-                    power: '65W',
-                    socket: 'AM5',
-                    price: '$229',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'Intel Core i9-13900KS',
-                specs: {
-                    architecture: 'Raptor Lake',
-                    process: '10nm Intel 7',
-                    cores: '24 (8P + 16E)',
-                    threads: '32',
-                    base_clock: '3.2 GHz',
-                    boost_clock: '6.0 GHz',
-                    cache: '36MB L3 + 32MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'Intel UHD 770',
-                    power: '150W/253W',
-                    socket: 'LGA 1700',
-                    price: '$699',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'Intel Core i7-13700F',
-                specs: {
-                    architecture: 'Raptor Lake',
-                    process: '10nm Intel 7',
-                    cores: '16 (8P + 8E)',
-                    threads: '24',
-                    base_clock: '2.1 GHz',
-                    boost_clock: '5.2 GHz',
-                    cache: '30MB L3 + 24MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'No',
-                    power: '65W/219W',
-                    socket: 'LGA 1700',
-                    price: '$329',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'AMD Ryzen 9 7900',
-                specs: {
-                    architecture: 'Zen 4',
-                    process: '5nm',
-                    cores: '12',
-                    threads: '24',
-                    base_clock: '3.7 GHz',
-                    boost_clock: '5.4 GHz',
-                    cache: '64MB L3 + 12MB L2',
-                    memory: 'DDR5',
-                    integrated_graphics: 'AMD RDNA 2',
-                    power: '65W',
-                    socket: 'AM5',
-                    price: '$429',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'AMD Ryzen 7 7700X',
-                specs: {
-                    architecture: 'Zen 4',
-                    process: '5nm',
-                    cores: '8',
-                    threads: '16',
-                    base_clock: '4.5 GHz',
-                    boost_clock: '5.4 GHz',
-                    cache: '32MB L3 + 8MB L2',
-                    memory: 'DDR5',
-                    integrated_graphics: 'AMD RDNA 2',
-                    power: '105W',
-                    socket: 'AM5',
-                    price: '$349',
-                    year: '2022'
                 }
             }
         ];
@@ -1265,24 +1175,6 @@
                 }
             },
             {
-                name: 'NVIDIA GeForce RTX 4070 SUPER',
-                specs: {
-                    architecture: 'Ada Lovelace',
-                    process: '5nm',
-                    cuda_cores: '7168',
-                    boost_clock: '2.48 GHz',
-                    memory: '12GB GDDR6X',
-                    memory_speed: '21 Gbps',
-                    memory_bus: '192-bit',
-                    bandwidth: '504 GB/s',
-                    ray_tracing: 'Yes',
-                    dlss: '3.0',
-                    power: '220W',
-                    price: '$599',
-                    year: '2024'
-                }
-            },
-            {
                 name: 'AMD Radeon RX 7900 XTX',
                 specs: {
                     architecture: 'RDNA 3',
@@ -1317,295 +1209,43 @@
                     price: '$499',
                     year: '2023'
                 }
-            },
-            {
-                name: 'AMD Radeon RX 7700 XT',
-                specs: {
-                    architecture: 'RDNA 3',
-                    process: '5nm + 6nm',
-                    stream_processors: '7168',
-                    boost_clock: '2.54 GHz',
-                    memory: '12GB GDDR6',
-                    memory_speed: '18 Gbps',
-                    memory_bus: '192-bit',
-                    bandwidth: '432 GB/s',
-                    ray_tracing: 'Yes',
-                    fsr: '3.0',
-                    power: '245W',
-                    price: '$449',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'NVIDIA GeForce RTX 3090 Ti',
-                specs: {
-                    architecture: 'Ampere',
-                    process: '8nm',
-                    cuda_cores: '10752',
-                    boost_clock: '1.86 GHz',
-                    memory: '24GB GDDR6X',
-                    memory_speed: '21 Gbps',
-                    memory_bus: '384-bit',
-                    bandwidth: '1008 GB/s',
-                    ray_tracing: 'Yes',
-                    dlss: '2.0',
-                    power: '450W',
-                    price: '$1999',
-                    year: '2022'
-                }
-            },
-            {
-                name: 'NVIDIA GeForce RTX 3080 Ti',
-                specs: {
-                    architecture: 'Ampere',
-                    process: '8nm',
-                    cuda_cores: '10240',
-                    boost_clock: '1.67 GHz',
-                    memory: '12GB GDDR6X',
-                    memory_speed: '19 Gbps',
-                    memory_bus: '384-bit',
-                    bandwidth: '912 GB/s',
-                    ray_tracing: 'Yes',
-                    dlss: '2.0',
-                    power: '350W',
-                    price: '$1199',
-                    year: '2021'
-                }
-            },
-            {
-                name: 'AMD Radeon RX 6950 XT',
-                specs: {
-                    architecture: 'RDNA 2',
-                    process: '7nm',
-                    stream_processors: '5120',
-                    boost_clock: '2.31 GHz',
-                    memory: '16GB GDDR6',
-                    memory_speed: '18 Gbps',
-                    memory_bus: '256-bit',
-                    bandwidth: '576 GB/s',
-                    ray_tracing: 'Yes',
-                    fsr: '2.0',
-                    power: '335W',
-                    price: '$1099',
-                    year: '2022'
-                }
-            },
-            {
-                name: 'AMD Radeon RX 6800 XT',
-                specs: {
-                    architecture: 'RDNA 2',
-                    process: '7nm',
-                    stream_processors: '4608',
-                    boost_clock: '2.25 GHz',
-                    memory: '16GB GDDR6',
-                    memory_speed: '16 Gbps',
-                    memory_bus: '256-bit',
-                    bandwidth: '512 GB/s',
-                    ray_tracing: 'Yes',
-                    fsr: '2.0',
-                    power: '300W',
-                    price: '$649',
-                    year: '2020'
-                }
-            },
-            {
-                name: 'NVIDIA GeForce RTX 3070',
-                specs: {
-                    architecture: 'Ampere',
-                    process: '8nm',
-                    cuda_cores: '5888',
-                    boost_clock: '1.73 GHz',
-                    memory: '8GB GDDR6',
-                    memory_speed: '14 Gbps',
-                    memory_bus: '256-bit',
-                    bandwidth: '448 GB/s',
-                    ray_tracing: 'Yes',
-                    dlss: '2.0',
-                    power: '220W',
-                    price: '$499',
-                    year: '2020'
-                }
-            },
-            {
-                name: 'NVIDIA GeForce RTX 4060',
-                specs: {
-                    architecture: 'Ada Lovelace',
-                    process: '5nm',
-                    cuda_cores: '3072',
-                    boost_clock: '2.46 GHz',
-                    memory: '8GB GDDR6',
-                    memory_speed: '17 Gbps',
-                    memory_bus: '128-bit',
-                    bandwidth: '272 GB/s',
-                    ray_tracing: 'Yes',
-                    dlss: '3.0',
-                    power: '115W',
-                    price: '$299',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'AMD Radeon RX 7600',
-                specs: {
-                    architecture: 'RDNA 3',
-                    process: '6nm',
-                    stream_processors: '2048',
-                    boost_clock: '2.66 GHz',
-                    memory: '8GB GDDR6',
-                    memory_speed: '18 Gbps',
-                    memory_bus: '128-bit',
-                    bandwidth: '288 GB/s',
-                    ray_tracing: 'Yes',
-                    fsr: '3.0',
-                    power: '165W',
-                    price: '$269',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'NVIDIA GeForce RTX 3060',
-                specs: {
-                    architecture: 'Ampere',
-                    process: '8nm',
-                    cuda_cores: '3584',
-                    boost_clock: '1.78 GHz',
-                    memory: '12GB GDDR6',
-                    memory_speed: '15 Gbps',
-                    memory_bus: '192-bit',
-                    bandwidth: '360 GB/s',
-                    ray_tracing: 'Yes',
-                    dlss: '2.0',
-                    power: '170W',
-                    price: '$329',
-                    year: '2021'
-                }
-            },
-            {
-                name: 'AMD Radeon RX 6700 XT',
-                specs: {
-                    architecture: 'RDNA 2',
-                    process: '7nm',
-                    stream_processors: '2560',
-                    boost_clock: '2.58 GHz',
-                    memory: '12GB GDDR6',
-                    memory_speed: '16 Gbps',
-                    memory_bus: '192-bit',
-                    bandwidth: '384 GB/s',
-                    ray_tracing: 'Yes',
-                    fsr: '2.0',
-                    power: '230W',
-                    price: '$479',
-                    year: '2021'
-                }
-            },
-            {
-                name: 'NVIDIA GeForce RTX 3050',
-                specs: {
-                    architecture: 'Ampere',
-                    process: '8nm',
-                    cuda_cores: '2560',
-                    boost_clock: '1.78 GHz',
-                    memory: '8GB GDDR6',
-                    memory_speed: '14 Gbps',
-                    memory_bus: '128-bit',
-                    bandwidth: '224 GB/s',
-                    ray_tracing: 'Yes',
-                    dlss: '2.0',
-                    power: '130W',
-                    price: '$249',
-                    year: '2022'
-                }
-            },
-            {
-                name: 'AMD Radeon RX 6600',
-                specs: {
-                    architecture: 'RDNA 2',
-                    process: '7nm',
-                    stream_processors: '1792',
-                    boost_clock: '2.49 GHz',
-                    memory: '8GB GDDR6',
-                    memory_speed: '14 Gbps',
-                    memory_bus: '128-bit',
-                    bandwidth: '224 GB/s',
-                    ray_tracing: 'Yes',
-                    fsr: '2.0',
-                    power: '132W',
-                    price: '$279',
-                    year: '2021'
-                }
-            },
-            {
-                name: 'NVIDIA GeForce GTX 1660 SUPER',
-                specs: {
-                    architecture: 'Turing',
-                    process: '12nm',
-                    cuda_cores: '1408',
-                    boost_clock: '1.79 GHz',
-                    memory: '6GB GDDR6',
-                    memory_speed: '14 Gbps',
-                    memory_bus: '192-bit',
-                    bandwidth: '336 GB/s',
-                    ray_tracing: 'No',
-                    dlss: 'No',
-                    power: '125W',
-                    price: '$229',
-                    year: '2019'
-                }
-            },
-            {
-                name: 'AMD Radeon RX 6500 XT',
-                specs: {
-                    architecture: 'RDNA 2',
-                    process: '6nm',
-                    stream_processors: '1024',
-                    boost_clock: '2.82 GHz',
-                    memory: '4GB GDDR6',
-                    memory_speed: '18 Gbps',
-                    memory_bus: '64-bit',
-                    bandwidth: '144 GB/s',
-                    ray_tracing: 'Yes',
-                    fsr: '2.0',
-                    power: '107W',
-                    price: '$199',
-                    year: '2022'
-                }
-            },
-            {
-                name: 'NVIDIA GeForce GTX 1650 SUPER',
-                specs: {
-                    architecture: 'Turing',
-                    process: '12nm',
-                    cuda_cores: '1280',
-                    boost_clock: '1.73 GHz',
-                    memory: '4GB GDDR6',
-                    memory_speed: '12 Gbps',
-                    memory_bus: '128-bit',
-                    bandwidth: '192 GB/s',
-                    ray_tracing: 'No',
-                    dlss: 'No',
-                    power: '100W',
-                    price: '$159',
-                    year: '2019'
-                }
             }
         ];
 
         const cpus = [
             {
-                name: 'Intel Core i9-14900K',
+                name: 'Intel Core i9-14900KS',
                 specs: {
                     architecture: 'Raptor Lake Refresh',
                     process: '10nm Intel 7',
                     cores: '24 (8P + 16E)',
                     threads: '32',
                     base_clock: '3.2 GHz',
-                    boost_clock: '6.0 GHz',
+                    boost_clock: '6.2 GHz',
                     cache: '36MB L3 + 32MB L2',
                     memory: 'DDR4/DDR5',
                     integrated_graphics: 'Intel UHD 770',
+                    power: '150W/253W',
+                    socket: 'LGA 1700',
+                    price: '$699',
+                    year: '2024'
+                }
+            },
+            {
+                name: 'Intel Core i7-14700KF',
+                specs: {
+                    architecture: 'Raptor Lake Refresh',
+                    process: '10nm Intel 7',
+                    cores: '20 (8P + 12E)',
+                    threads: '28',
+                    base_clock: '3.4 GHz',
+                    boost_clock: '5.6 GHz',
+                    cache: '33MB L3 + 28MB L2',
+                    memory: 'DDR4/DDR5',
+                    integrated_graphics: 'No',
                     power: '125W/253W',
                     socket: 'LGA 1700',
-                    price: '$589',
+                    price: '$409',
                     year: '2023'
                 }
             },
@@ -1618,30 +1258,12 @@
                     threads: '32',
                     base_clock: '4.2 GHz',
                     boost_clock: '5.7 GHz',
-                    cache: '144MB (128MB L3 + 16MB L2)',
+                    cache: '128MB L3 + 16MB L2',
                     memory: 'DDR5',
                     integrated_graphics: 'AMD RDNA 2',
-                    power: '120W/162W',
+                    power: '120W',
                     socket: 'AM5',
                     price: '$699',
-                    year: '2023'
-                }
-            },
-            {
-                name: 'Intel Core i7-14700K',
-                specs: {
-                    architecture: 'Raptor Lake Refresh',
-                    process: '10nm Intel 7',
-                    cores: '20 (8P + 12E)',
-                    threads: '28',
-                    base_clock: '3.4 GHz',
-                    boost_clock: '5.6 GHz',
-                    cache: '33MB L3 + 28MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'Intel UHD 770',
-                    power: '125W/253W',
-                    socket: 'LGA 1700',
-                    price: '$409',
                     year: '2023'
                 }
             },
@@ -1654,31 +1276,13 @@
                     threads: '16',
                     base_clock: '4.2 GHz',
                     boost_clock: '5.0 GHz',
-                    cache: '104MB (96MB L3 + 8MB L2)',
+                    cache: '96MB L3 + 8MB L2',
                     memory: 'DDR5',
                     integrated_graphics: 'AMD RDNA 2',
                     power: '120W',
                     socket: 'AM5',
                     price: '$449',
                     year: '2023'
-                }
-            },
-            {
-                name: 'AMD Ryzen 5 7600X',
-                specs: {
-                    architecture: 'Zen 4',
-                    process: '5nm',
-                    cores: '6',
-                    threads: '12',
-                    base_clock: '4.7 GHz',
-                    boost_clock: '5.3 GHz',
-                    cache: '38MB (32MB L3 + 6MB L2)',
-                    memory: 'DDR5',
-                    integrated_graphics: 'AMD RDNA 2',
-                    power: '105W',
-                    socket: 'AM5',
-                    price: '$249',
-                    year: '2022'
                 }
             },
             {
@@ -1698,97 +1302,335 @@
                     price: '$319',
                     year: '2023'
                 }
+            }
+        ];
+
+        const laptops = [
+            {
+                name: 'Apple MacBook Pro 16" (M3 Max)',
+                specs: {
+                    processor: 'Apple M3 Max',
+                    cores: '16-core CPU, 40-core GPU',
+                    ram: '64GB',
+                    storage: '1TB/2TB/4TB/8TB SSD',
+                    screen: '16.2"',
+                    resolution: '3456 x 2234',
+                    refresh_rate: '120 Hz',
+                    display_type: 'Liquid Retina XDR',
+                    weight: '2.2 kg',
+                    battery: '100 Wh',
+                    battery_life: 'Up to 22 hours',
+                    connectivity: 'Thunderbolt 4, HDMI, MagSafe, SD card',
+                    keyboard: 'Magic Keyboard with Touch ID',
+                    os: 'macOS Sonoma',
+                    price: '$3499',
+                    year: '2023'
+                }
             },
             {
-                name: 'Intel Core i5-13600K',
+                name: 'Dell XPS 16 (2024)',
                 specs: {
-                    architecture: 'Raptor Lake',
-                    process: '10nm Intel 7',
-                    cores: '14 (6P + 8E)',
-                    threads: '20',
-                    base_clock: '3.5 GHz',
-                    boost_clock: '5.1 GHz',
-                    cache: '24MB L3 + 20MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'Intel UHD 770',
-                    power: '125W/181W',
-                    socket: 'LGA 1700',
-                    price: '$319',
+                    processor: 'Intel Core Ultra 9 185H',
+                    cores: '16 cores',
+                    ram: '32GB LPDDR5X',
+                    storage: '1TB NVMe SSD',
+                    gpu: 'NVIDIA GeForce RTX 4070',
+                    screen: '16.3"',
+                    resolution: '3840 x 2400',
+                    refresh_rate: '90 Hz',
+                    display_type: 'OLED Touch',
+                    weight: '2.1 kg',
+                    battery: '99.5 Wh',
+                    battery_life: 'Up to 14 hours',
+                    connectivity: 'Thunderbolt 4, USB-C, SD card',
+                    keyboard: 'Edge-to-edge keyboard with fingerprint reader',
+                    os: 'Windows 11',
+                    price: '$2399',
+                    year: '2024'
+                }
+            },
+            {
+                name: 'Lenovo Legion Pro 7 (2024)',
+                specs: {
+                    processor: 'AMD Ryzen 9 7945HX',
+                    cores: '16 cores, 32 threads',
+                    ram: '32GB DDR5',
+                    storage: '1TB NVMe PCIe Gen4 SSD',
+                    gpu: 'NVIDIA GeForce RTX 4090',
+                    screen: '16"',
+                    resolution: '2560 x 1600',
+                    refresh_rate: '240 Hz',
+                    display_type: 'IPS',
+                    weight: '2.8 kg',
+                    battery: '99.9 Wh',
+                    battery_life: 'Up to 7 hours',
+                    connectivity: 'USB-C, USB-A, HDMI, Ethernet',
+                    keyboard: 'Per-key RGB backlit keyboard',
+                    cooling: 'Legion Coldfront 5.0',
+                    os: 'Windows 11',
+                    price: '$2599',
+                    year: '2024'
+                }
+            },
+            {
+                name: 'ASUS ROG Zephyrus G14 (2024)',
+                specs: {
+                    processor: 'AMD Ryzen 9 8945HS',
+                    cores: '8 cores, 16 threads',
+                    ram: '16GB LPDDR5X',
+                    storage: '1TB NVMe SSD',
+                    gpu: 'NVIDIA GeForce RTX 4070',
+                    screen: '14"',
+                    resolution: '2880 x 1800',
+                    refresh_rate: '120 Hz',
+                    display_type: 'OLED',
+                    weight: '1.5 kg',
+                    battery: '73 Wh',
+                    battery_life: 'Up to 10 hours',
+                    connectivity: 'USB-C, USB-A, HDMI, Audio jack',
+                    keyboard: 'RGB backlit keyboard',
+                    cooling: 'Intelligent Cooling with liquid metal',
+                    os: 'Windows 11',
+                    price: '$1899',
+                    year: '2024'
+                }
+            },
+            {
+                name: 'Microsoft Surface Laptop Studio 2',
+                specs: {
+                    processor: 'Intel Core i7-13700H',
+                    cores: '14 cores (6P + 8E)',
+                    ram: '32GB LPDDR5X',
+                    storage: '1TB SSD',
+                    gpu: 'NVIDIA GeForce RTX 4060',
+                    screen: '14.4"',
+                    resolution: '2400 x 1600',
+                    refresh_rate: '120 Hz',
+                    display_type: 'PixelSense Flow touch',
+                    weight: '1.8 kg',
+                    battery: '58 Wh',
+                    battery_life: 'Up to 18 hours',
+                    connectivity: 'Thunderbolt 4, USB-A, Surface Connect',
+                    keyboard: 'Backlit keyboard',
+                    os: 'Windows 11',
+                    price: '$2399',
+                    year: '2023'
+                }
+            }
+        ];
+
+        const tablets = [
+            {
+                name: 'Apple iPad Pro 12.9" (M4)',
+                specs: {
+                    processor: 'Apple M4',
+                    ram: '16GB',
+                    storage: '256GB/512GB/1TB/2TB',
+                    screen: '12.9"',
+                    resolution: '2732 x 2048',
+                    refresh_rate: '120 Hz',
+                    display_type: 'Liquid Retina XDR',
+                    battery: '10000 mAh',
+                    battery_life: 'Up to 10 hours',
+                    camera: '12MP Ultra Wide front, 12MP Wide + 10MP Ultra Wide back',
+                    weight: '680g',
+                    charging: 'USB-C',
+                    pencil_support: 'Apple Pencil Pro',
+                    keyboard_support: 'Magic Keyboard',
+                    os: 'iPadOS 18',
+                    price: '$1299',
+                    year: '2024'
+                }
+            },
+            {
+                name: 'Samsung Galaxy Tab S9 Ultra',
+                specs: {
+                    processor: 'Snapdragon 8 Gen 2',
+                    ram: '12GB/16GB',
+                    storage: '256GB/512GB/1TB',
+                    screen: '14.6"',
+                    resolution: '2960 x 1848',
+                    refresh_rate: '120 Hz',
+                    display_type: 'Dynamic AMOLED 2X',
+                    battery: '11200 mAh',
+                    battery_life: 'Up to 13 hours',
+                    camera: '12MP front, 13MP + 8MP back',
+                    weight: '732g',
+                    charging: '45W',
+                    pencil_support: 'S Pen (included)',
+                    keyboard_support: 'Book Cover Keyboard',
+                    os: 'Android 13',
+                    ip_rating: 'IP68',
+                    price: '$1199',
+                    year: '2023'
+                }
+            },
+            {
+                name: 'Microsoft Surface Pro 10',
+                specs: {
+                    processor: 'Snapdragon X Elite',
+                    ram: '16GB/32GB',
+                    storage: '256GB/512GB/1TB',
+                    screen: '13"',
+                    resolution: '2880 x 1920',
+                    refresh_rate: '120 Hz',
+                    display_type: 'PixelSense Flow',
+                    battery: 'Up to 14 hours',
+                    camera: '1080p front, 10MP back',
+                    weight: '879g',
+                    charging: 'USB-C',
+                    pencil_support: 'Surface Slim Pen 2',
+                    keyboard_support: 'Surface Pro Keyboard',
+                    os: 'Windows 11',
+                    price: '$1299',
+                    year: '2024'
+                }
+            },
+            {
+                name: 'Google Pixel Tablet',
+                specs: {
+                    processor: 'Tensor G2',
+                    ram: '8GB',
+                    storage: '128GB/256GB',
+                    screen: '11"',
+                    resolution: '2560 x 1600',
+                    refresh_rate: '60 Hz',
+                    display_type: 'LCD',
+                    battery: '7020 mAh',
+                    battery_life: 'Up to 12 hours',
+                    camera: '8MP front, 8MP back',
+                    weight: '493g',
+                    charging: 'USB-C, Charging Speaker Dock',
+                    pencil_support: 'USI 2.0 stylus',
+                    keyboard_support: 'Bluetooth keyboards',
+                    os: 'Android 13',
+                    price: '$499',
+                    year: '2023'
+                }
+            },
+            {
+                name: 'Lenovo Tab P12 Pro',
+                specs: {
+                    processor: 'Snapdragon 870',
+                    ram: '8GB',
+                    storage: '256GB',
+                    screen: '12.6"',
+                    resolution: '2560 x 1600',
+                    refresh_rate: '120 Hz',
+                    display_type: 'AMOLED',
+                    battery: '10200 mAh',
+                    battery_life: 'Up to 15 hours',
+                    camera: '8MP front, 13MP + 5MP back',
+                    weight: '565g',
+                    charging: '45W',
+                    pencil_support: 'Precision Pen 3',
+                    keyboard_support: 'Keyboard Pack',
+                    os: 'Android 12',
+                    price: '$699',
+                    year: '2023'
+                }
+            }
+        ];
+
+        const watches = [
+            {
+                name: 'Apple Watch Ultra 2',
+                specs: {
+                    processor: 'S9 SiP',
+                    storage: '64GB',
+                    screen: '1.92"',
+                    resolution: '502 x 410',
+                    display_type: 'LTPO OLED',
+                    battery: '564 mAh',
+                    battery_life: 'Up to 36 hours (72h in low power)',
+                    water_resistance: '100m',
+                    heart_rate: 'Yes, ECG',
+                    gps: 'L1+L5 dual-frequency',
+                    connectivity: 'WiFi, Bluetooth, Cellular',
+                    os: 'watchOS 10',
+                    price: '$799',
+                    year: '2023'
+                }
+            },
+            {
+                name: 'Samsung Galaxy Watch 6 Pro',
+                specs: {
+                    processor: 'Exynos W930',
+                    ram: '2GB',
+                    storage: '16GB',
+                    screen: '1.5"',
+                    resolution: '480 x 480',
+                    display_type: 'AMOLED',
+                    battery: '590 mAh',
+                    battery_life: 'Up to 40 hours',
+                    water_resistance: '5 ATM + IP68',
+                    heart_rate: 'Yes, BioActive Sensor',
+                    gps: 'Yes, dual-frequency',
+                    connectivity: 'WiFi, Bluetooth, LTE',
+                    os: 'Wear OS 4',
+                    price: '$449',
+                    year: '2023'
+                }
+            },
+            {
+                name: 'Garmin Fenix 7X Sapphire',
+                specs: {
+                    processor: 'Custom',
+                    storage: '32GB',
+                    screen: '1.4"',
+                    resolution: '280 x 280',
+                    display_type: 'MIP Touchscreen',
+                    battery: 'Up to 37 days',
+                    battery_life: 'Up to 122 hours GPS',
+                    water_resistance: '10 ATM',
+                    heart_rate: 'Yes, Pulse Ox',
+                    gps: 'Multi-band GNSS',
+                    connectivity: 'WiFi, Bluetooth, ANT+',
+                    os: 'Garmin OS',
+                    price: '$899',
                     year: '2022'
                 }
             },
             {
-                name: 'Intel Core i7-13700K',
+                name: 'Google Pixel Watch 2',
                 specs: {
-                    architecture: 'Raptor Lake',
-                    process: '10nm Intel 7',
-                    cores: '16 (8P + 8E)',
-                    threads: '24',
-                    base_clock: '3.4 GHz',
-                    boost_clock: '5.4 GHz',
-                    cache: '30MB L3 + 24MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'Intel UHD 770',
-                    power: '125W/253W',
-                    socket: 'LGA 1700',
-                    price: '$409',
-                    year: '2022'
+                    processor: 'Qualcomm Snapdragon Wear 5100',
+                    ram: '2GB',
+                    storage: '32GB',
+                    screen: '1.2"',
+                    resolution: '450 x 450',
+                    display_type: 'AMOLED',
+                    battery: '306 mAh',
+                    battery_life: 'Up to 24 hours',
+                    water_resistance: '5 ATM',
+                    heart_rate: 'Yes, Fitbit sensors',
+                    gps: 'Yes',
+                    connectivity: 'WiFi, Bluetooth, LTE optional',
+                    os: 'Wear OS 4',
+                    price: '$349',
+                    year: '2023'
                 }
             },
             {
-                name: 'AMD Ryzen 5 5600X',
+                name: 'Huawei Watch Ultimate',
                 specs: {
-                    architecture: 'Zen 3',
-                    process: '7nm',
-                    cores: '6',
-                    threads: '12',
-                    base_clock: '3.7 GHz',
-                    boost_clock: '4.6 GHz',
-                    cache: '32MB L3 + 3MB L2',
-                    memory: 'DDR4',
-                    integrated_graphics: 'No',
-                    power: '65W',
-                    socket: 'AM4',
-                    price: '$199',
-                    year: '2020'
-                }
-            },
-            {
-                name: 'AMD Ryzen 9 5950X',
-                specs: {
-                    architecture: 'Zen 3',
-                    process: '7nm',
-                    cores: '16',
-                    threads: '32',
-                    base_clock: '3.4 GHz',
-                    boost_clock: '4.9 GHz',
-                    cache: '64MB L3 + 8MB L2',
-                    memory: 'DDR4',
-                    integrated_graphics: 'No',
-                    power: '105W',
-                    socket: 'AM4',
-                    price: '$549',
-                    year: '2020'
-                }
-            },
-            {
-                name: 'Intel Core i9-12900K',
-                specs: {
-                    architecture: 'Alder Lake',
-                    process: '10nm Intel 7',
-                    cores: '16 (8P + 8E)',
-                    threads: '24',
-                    base_clock: '3.2 GHz',
-                    boost_clock: '5.2 GHz',
-                    cache: '30MB L3 + 14MB L2',
-                    memory: 'DDR4/DDR5',
-                    integrated_graphics: 'Intel UHD 770',
-                    power: '125W/241W',
-                    socket: 'LGA 1700',
-                    price: '$589',
-                    year: '2021'
+                    processor: 'Custom',
+                    storage: '4GB',
+                    screen: '1.5"',
+                    resolution: '466 x 466',
+                    display_type: 'AMOLED',
+                    battery: '530 mAh',
+                    battery_life: 'Up to 14 days',
+                    water_resistance: '100m, Dive-ready',
+                    heart_rate: 'Yes, TruSeen 5.0+',
+                    gps: 'Yes, dual-band',
+                    connectivity: 'Bluetooth, NFC',
+                    os: 'HarmonyOS',
+                    price: '$749',
+                    year: '2023'
                 }
             }
         ];
     </script>
+</body>
 </html>
